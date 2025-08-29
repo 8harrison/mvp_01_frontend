@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanças Pessoais | SPA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--dark);
+        }
+        
+        .navbar {
+            background-color: var(--primary);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+        }
+        
+        .section {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.5s;
+        }
+        
+        .active-section {
+            display: block;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-entrada {
+            border-left: 4px solid var(--success);
+        }
+        
+        .card-saida {
+            border-left: 4px solid var(--accent);
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            border: none;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent);
+            border: none;
+        }
+        
+        .movimentacao-valor {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .entrada {
+            color: var(--success);
+        }
+        
+        .saida {
+            color: var(--accent);
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .form-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .filter-buttons {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-wallet me-2"></i>Finanças Pessoais
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link section-link" href="#" data-section="login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link section-link" href="#" data-section="registro">Registrar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link section-link" href="#" data-section="dashboard">Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Login Section -->
+        <section id="login" class="section">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="form-container">
+                        <h2 class="text-center mb-4">Login</h2>
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label for="loginUsername" class="form-label">Usuário</label>
+                                <input type="text" class="form-control" id="loginUsername" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="loginPassword" class="form-label">Senha</label>
+                                <input type="password" class="form-control" id="loginPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                        </form>
+                        <div class="alert alert-danger mt-3 d-none" id="loginError"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Register Section -->
+        <section id="registro" class="section">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="form-container">
+                        <h2 class="text-center mb-4">Registrar Usuário</h2>
+                        <form id="registerForm">
+                            <div class="mb-3">
+                                <label for="registerUsername" class="form-label">Usuário</label>
+                                <input type="text" class="form-control" id="registerUsername" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerPassword" class="form-label">Senha</label>
+                                <input type="password" class="form-control" id="registerPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerSaldo" class="form-label">Saldo Inicial (opcional)</label>
+                                <input type="number" class="form-control" id="registerSaldo" step="0.01">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Registrar</button>
+                        </form>
+                        <div class="alert alert-danger mt-3 d-none" id="registerError"></div>
+                        <div class="alert alert-success mt-3 d-none" id="registerSuccess"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section">
+            <div class="dashboard-header">
+                <h2>Dashboard</h2>
+                <button class="btn btn-primary" id="addMovimentacaoBtn">
+                    <i class="fas fa-plus me-2"></i>Nova Movimentação
+                </button>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card stats-card">
+                        <h5>Saldo Atual</h5>
+                        <div class="stats-number" id="saldoAtual">R$ 0,00</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stats-card">
+                        <h5>Entradas</h5>
+                        <div class="stats-number entrada" id="totalEntradas">R$ 0,00</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stats-card">
+                        <h5>Saídas</h5>
+                        <div class="stats-number saida" id="totalSaidas">R$ 0,00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="filter-buttons">
+                <button class="btn btn-outline-primary active" data-filter="todos">Todos</button>
+                <button class="btn btn-outline-success" data-filter="entrada">Entradas</button>
+                <button class="btn btn-outline-danger" data-filter="saida">Saídas</button>
+            </div>
+
+            <!-- Movimentações List -->
+            <div id="movimentacoesList" class="row">
+                <!-- Cards will be loaded here -->
+                <div class="loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-2">Carregando movimentações...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add/Edit Movimentação Modal -->
+        <div class="modal fade" id="movimentacaoModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTitle">Adicionar Movimentação</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="movimentacaoForm">
+                            <input type="hidden" id="movimentacaoId">
+                            <div class="mb-3">
+                                <label for="valor" class="form-label">Valor</label>
+                                <input type="number" class="form-control" id="valor" step="0.01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tipo" class="form-label">Tipo</label>
+                                <select class="form-select" id="tipo" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="ENTRADA">Entrada</option>
+                                    <option value="SAIDA">Saída</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="data_movimentacao" class="form-label">Data</label>
+                                <input type="datetime-local" class="form-control" id="data_movimentacao" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="categoria" class="form-label">Categoria</label>
+                                <input type="text" class="form-control" id="categoria" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="descricao" class="form-label">Descrição</label>
+                                <textarea class="form-control" id="descricao" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contraparte" class="form-label">Contraparte</label>
+                                <input type="text" class="form-control" id="contraparte">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="saveMovimentacaoBtn">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // API Base URL
+        const API_BASE_URL = 'http://localhost:5000';
+        
+        // Estado da aplicação
+        let currentUser = null;
+        let movimentacoes = [];
+        let editingMovimentacaoId = null;
+        
+        // Elementos DOM
+        const sectionLinks = document.querySelectorAll('.section-link');
+        const sections = document.querySelectorAll('.section');
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar navegação
+            sectionLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('data-section');
+                    showSection(sectionId);
+                });
+            });
+            
+            // Mostrar a seção de login por padrão
+            showSection('login');
+            
+            // Configurar formulários
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            document.getElementById('addMovimentacaoBtn').addEventListener('click', showAddMovimentacaoModal);
+            document.getElementById('saveMovimentacaoBtn').addEventListener('click', saveMovimentacao);
+            
+            // Configurar filtros
+            document.querySelectorAll('.filter-buttons button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    filterMovimentacoes(filter);
+                    
+                    // Ativar botão selecionado
+                    document.querySelectorAll('.filter-buttons button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+            
+            // Verificar se há um token salvo
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                // Verificar se o token é válido
+                currentUser = JSON.parse(localStorage.getItem('user'));
+                showSection('dashboard');
+                loadMovimentacoes();
+            }
+        });
+        
+        // Funções de navegação
+        function showSection(sectionId) {
+            sections.forEach(section => {
+                section.classList.remove('active-section');
+            });
+            
+            document.getElementById(sectionId).classList.add('active-section');
+            
+            // Se for o dashboard, carregar as movimentações
+            if (sectionId === 'dashboard' && currentUser) {
+                loadMovimentacoes();
+            }
+        }
+        
+        // Funções de autenticação
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/autenticar_usuario`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        senha: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Login bem-sucedido
+                    currentUser = data;
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('user', JSON.stringify(data));
+                    
+                    showSection('dashboard');
+                    loadMovimentacoes();
+                } else {
+                    // Exibir erro
+                    document.getElementById('loginError').textContent = data.erro || 'Erro ao fazer login';
+                    document.getElementById('loginError').classList.remove('d-none');
+                }
+            } catch (error) {
+                document.getElementById('loginError').textContent = 'Erro de conexão. Tente novamente.';
+                document.getElementById('loginError').classList.remove('d-none');
+            }
+        }
+        
+        async function handleRegister(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            const saldo = document.getElementById('registerSaldo').value || 0;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/registrar_usuario`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        senha: password,
+                        saldo: parseFloat(saldo)
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Registro bem-sucedido
+                    document.getElementById('registerSuccess').textContent = 'Usuário registrado com sucesso!';
+                    document.getElementById('registerSuccess').classList.remove('d-none');
+                    document.getElementById('registerError').classList.add('d-none');
+                    
+                    // Limpar formulário
+                    document.getElementById('registerForm').reset();
+                } else {
+                    // Exibir erro
+                    document.getElementById('registerError').textContent = data.erro || 'Erro ao registrar usuário';
+                    document.getElementById('registerError').classList.remove('d-none');
+                    document.getElementById('registerSuccess').classList.add('d-none');
+                }
+            } catch (error) {
+                document.getElementById('registerError').textContent = 'Erro de conexão. Tente novamente.';
+                document.getElementById('registerError').classList.remove('d-none');
+                document.getElementById('registerSuccess').classList.add('d-none');
+            }
+        }
+        
+        // Funções de movimentações
+        async function loadMovimentacoes() {
+            try {
+                const token = localStorage.getItem('authToken');
+                
+                const response = await fetch(`${API_BASE_URL}/listar_movimentacoes`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    movimentacoes = data.data || [];
+                    renderMovimentacoes();
+                    updateDashboardStats();
+                } else {
+                    console.error('Erro ao carregar movimentações');
+                }
+            } catch (error) {
+                console.error('Erro de conexão:', error);
+            }
+        }
+        
+        function renderMovimentacoes() {
+            const movimentacoesList = document.getElementById('movimentacoesList');
+            movimentacoesList.innerHTML = '';
+            
+            if (movimentacoes.length === 0) {
+                movimentacoesList.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-receipt fa-3x mb-3 text-muted"></i>
+                        <h4 class="text-muted">Nenhuma movimentação encontrada</h4>
+                        <p>Adicione sua primeira movimentação clicando no botão "Nova Movimentação"</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            movimentacoes.forEach(mov => {
+                const cardClass = mov.tipo === 'ENTRADA' ? 'card-entrada' : 'card-saida';
+                const valorClass = mov.tipo === 'ENTRADA' ? 'entrada' : 'saida';
+                const icon = mov.tipo === 'ENTRADA' ? 'fa-arrow-down' : 'fa-arrow-up';
+                
+                const date = new Date(mov.data_movimentacao);
+                const formattedDate = date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR');
+                
+                movimentacoesList.innerHTML += `
+                    <div class="col-md-6 col-lg-4 movimentacao-card" data-type="${mov.tipo.toLowerCase()}">
+                        <div class="card ${cardClass}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title">${mov.categoria}</h5>
+                                    <div class="movimentacao-valor ${valorClass}">
+                                        <i class="fas ${icon} me-1"></i>R$ ${mov.valor.toFixed(2)}
+                                    </div>
+                                </div>
+                                <p class="card-text">${mov.descricao || 'Sem descrição'}</p>
+                                <p class="card-text"><small class="text-muted">${formattedDate}</small></p>
+                                <p class="card-text"><small class="text-muted">Contraparte: ${mov.contraparte || 'Não informada'}</small></p>
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn btn-sm btn-outline-primary me-2" onclick="editMovimentacao(${mov.id})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteMovimentacao(${mov.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        function filterMovimentacoes(filter) {
+            const cards = document.querySelectorAll('.movimentacao-card');
+            
+            cards.forEach(card => {
+                if (filter === 'todos') {
+                    card.style.display = 'block';
+                } else {
+                    const type = card.getAttribute('data-type');
+                    card.style.display = type === filter ? 'block' : 'none';
+                }
+            });
+        }
+        
+        function updateDashboardStats() {
+            const saldoAtual = currentUser?.saldo || 0;
+            const totalEntradas = movimentacoes
+                .filter(m => m.tipo === 'ENTRADA')
+                .reduce((sum, m) => sum + m.valor, 0);
+            const totalSaidas = movimentacoes
+                .filter(m => m.tipo === 'SAIDA')
+                .reduce((sum, m) => sum + m.valor, 0);
+            
+            document.getElementById('saldoAtual').textContent = `R$ ${saldoAtual.toFixed(2)}`;
+            document.getElementById('totalEntradas').textContent = `R$ ${totalEntradas.toFixed(2)}`;
+            document.getElementById('totalSaidas').textContent = `R$ ${totalSaidas.toFixed(2)}`;
+        }
+        
+        function showAddMovimentacaoModal() {
+            editingMovimentacaoId = null;
+            document.getElementById('modalTitle').textContent = 'Adicionar Movimentação';
+            document.getElementById('movimentacaoForm').reset();
+            document.getElementById('movimentacaoId').value = '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('movimentacaoModal'));
+            modal.show();
+        }
+        
+        function editMovimentacao(id) {
+            const mov = movimentacoes.find(m => m.id === id);
+            if (!mov) return;
+            
+            editingMovimentacaoId = id;
+            document.getElementById('modalTitle').textContent = 'Editar Movimentação';
+            document.getElementById('movimentacaoId').value = mov.id;
+            document.getElementById('valor').value = mov.valor;
+            document.getElementById('tipo').value = mov.tipo;
+            
+            // Formatar data para o input datetime-local
+            const date = new Date(mov.data_movimentacao);
+            const formattedDate = date.toISOString().slice(0, 16);
+            document.getElementById('data_movimentacao').value = formattedDate;
+            
+            document.getElementById('categoria').value = mov.categoria;
+            document.getElementById('descricao').value = mov.descricao || '';
+            document.getElementById('contraparte').value = mov.contraparte || '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('movimentacaoModal'));
+            modal.show();
+        }
+        
+        async function saveMovimentacao() {
+            const form = document.getElementById('movimentacaoForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const movimentacaoData = {
+                valor: parseFloat(document.getElementById('valor').value),
+                tipo: document.getElementById('tipo').value,
+                data_movimentacao: document.getElementById('data_movimentacao').value,
+                categoria: document.getElementById('categoria').value,
+                descricao: document.getElementById('descricao').value,
+                contraparte: document.getElementById('contraparte').value,
+                usuario_id: currentUser.usuario_id
+            };
+            
+            try {
+                const token = localStorage.getItem('authToken');
+                const url = editingMovimentacaoId ? 
+                    `${API_BASE_URL}/atualizar_movimentacao` : 
+                    `${API_BASE_URL}/adicionar_movimentacao`;
+                
+                const method = editingMovimentacaoId ? 'PUT' : 'POST';
+                
+                if (editingMovimentacaoId) {
+                    movimentacaoData.id = editingMovimentacaoId;
+                }
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(movimentacaoData)
+                });
+                
+                if (response.ok) {
+                    // Fechar modal e recarregar movimentações
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('movimentacaoModal'));
+                    modal.hide();
+                    
+                    loadMovimentacoes();
+                } else {
+                    const data = await response.json();
+                    alert('Erro ao salvar movimentação: ' + (data.erro || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                alert('Erro de conexão. Tente novamente.');
+            }
+        }
+        
+        async function deleteMovimentacao(id) {
+            if (!confirm('Tem certeza que deseja excluir esta movimentação?')) {
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('authToken');
+                
+                const response = await fetch(`${API_BASE_URL}/excluir_movimentacao`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        movimentacao_id: id,
+                        usuario_id: currentUser.usuario_id
+                    })
+                });
+                
+                if (response.ok) {
+                    // Recarregar movimentações
+                    loadMovimentacoes();
+                } else {
+                    const data = await response.json();
+                    alert('Erro ao excluir movimentação: ' + (data.erro || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                alert('Erro de conexão. Tente novamente.');
+            }
+        }
+        
+        // Funções globais para uso nos event listeners
+        window.editMovimentacao = editMovimentacao;
+        window.deleteMovimentacao = deleteMovimentacao;
+    </script>
+</body>
+</html>
