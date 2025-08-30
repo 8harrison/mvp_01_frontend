@@ -20,7 +20,6 @@ async function handleLogin(e) {
     const {data} = await response.json();
 
     if (response.ok) {
-      localStorage.setItem("authToken", data.token);
       localStorage.setItem("user", JSON.stringify(data));
       window.location.href = "dashboard.html";
     } else {

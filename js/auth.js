@@ -5,10 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(html => {
       document.getElementById("navbar-container").innerHTML = html;
 
-      const token = localStorage.getItem("authToken");
+      const user = localStorage.getItem("user");
       const navLinks = document.getElementById("nav-links");
 
-      if (token) {
+      if (user) {
         // mostra dashboard e sair
         navLinks.querySelector('a[href="login.html"]').parentElement.classList.add("d-none");
         navLinks.querySelector('a[href="registro.html"]').parentElement.classList.add("d-none");

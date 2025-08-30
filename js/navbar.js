@@ -26,10 +26,10 @@ class AppNavbar extends HTMLElement {
   }
 
   setupAuth() {
-    const token = localStorage.getItem("authToken");
+    const user = localStorage.getItem("user");
     const navLinks = this.querySelector("#nav-links");
 
-    if (token) {
+    if (user) {
       navLinks.querySelector('a[href="login.html"]').parentElement.classList.add("d-none");
       navLinks.querySelector('a[href="registro.html"]').parentElement.classList.add("d-none");
       navLinks.querySelector('a[href="dashboard.html"]').parentElement.classList.remove("d-none");
