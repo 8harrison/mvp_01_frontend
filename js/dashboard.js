@@ -1,8 +1,22 @@
-const API_BASE_URL = "http://localhost:5000";
-
 let currentUser = null;
 let movimentacoes = [];
 let editingMovimentacaoId = null;
+
+function getElementById(elementId) {
+  return document.getElementById(elementId);
+}
+
+function getValueById(elementId) {
+  return getElementById(elementId).value;
+}
+
+function setValueById(elementId, value) {
+  getElementById(elementId).value = value;
+}
+
+function setTextContentById(elementId, text) {
+  getElementById(elementId).textContent = text;
+}
 
 // Carregar usuário logado
 document.addEventListener("DOMContentLoaded", () => {
@@ -11,12 +25,14 @@ document.addEventListener("DOMContentLoaded", () => {
     loadMovimentacoes();
   }
 
-  document
-    .getElementById("addMovimentacaoBtn")
-    .addEventListener("click", showAddMovimentacaoModal);
-  document
-    .getElementById("saveMovimentacaoBtn")
-    ?.addEventListener("click", saveMovimentacao);
+  getElementById("addMovimentacaoBtn").addEventListener(
+    "click",
+    showAddMovimentacaoModal
+  );
+  getElementById("saveMovimentacaoBtn")?.addEventListener(
+    "click",
+    saveMovimentacao
+  );
 
   document.querySelectorAll(".filter-buttons button").forEach((button) => {
     button.addEventListener("click", function () {
@@ -30,13 +46,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+async function getMovimentacoes(userId) {
+  return await fetch(`${API_BASE_URL}${GET_MOV_URL}?usuario_id=${userId}`);
+}
+
 async function loadMovimentacoes() {
   try {
-    const userId = currentUser["usuario_id"];
+    const userId = currentUser.usuario_id;
 
-    const response = await fetch(
-      `${API_BASE_URL}/listar_movimentacoes?usuario_id=${userId}`
-    );
+    const response = await getMovimentacoes(userId);
 
     if (response.ok) {
       const { data } = await response.json();
@@ -45,15 +63,15 @@ async function loadMovimentacoes() {
       renderMovimentacoes();
       updateDashboardStats();
     } else {
-      console.error("Erro ao carregar movimentações");
+      console.error(ERRO_CAR_MOV);
     }
   } catch (error) {
-    console.error("Erro de conexão:", error);
+    console.error(ERRO_CONEXAO, error);
   }
 }
 
 function renderMovimentacoes() {
-  const list = document.getElementById("movimentacoesList");
+  const list = getElementById("movimentacoesList");
   list.innerHTML = "";
 
   if (movimentacoes.length === 0) {
@@ -67,7 +85,7 @@ function renderMovimentacoes() {
     return;
   }
 
-  movimentacoes.forEach(mov => {
+  movimentacoes.forEach((mov) => {
     const card = document.createElement("movimentacao-card");
     card.setAttribute("data-movimentacao", JSON.stringify(mov));
 
@@ -84,11 +102,11 @@ function renderMovimentacoes() {
   });
 }
 
-
 function filterMovimentacoes(filter) {
-  document.querySelectorAll(".movimentacao-card").forEach((card) => {
+  document.querySelectorAll("movimentacao-card").forEach((card) => {
+    const mov = card.movimentacao;
     card.style.display =
-      filter === "todos" || card.getAttribute("data-type") === filter
+      filter === "todos" || mov.tipo.toLowerCase() === filter
         ? "block"
         : "none";
   });
@@ -103,24 +121,16 @@ function updateDashboardStats() {
     .filter((m) => m.tipo === "SAIDA")
     .reduce((s, m) => s + m.valor, 0);
 
-  document.getElementById("saldoAtual").textContent = `R$ ${saldoAtual.toFixed(
-    2
-  )}`;
-  document.getElementById("totalEntradas").textContent = `R$ ${entradas.toFixed(
-    2
-  )}`;
-  document.getElementById("totalSaidas").textContent = `R$ ${saidas.toFixed(
-    2
-  )}`;
+  setTextContentById("saldoAtual", `R$ ${saldoAtual.toFixed(2)}`);
+  setTextContentById("totalEntradas", `R$ ${entradas.toFixed(2)}`);
+  setTextContentById("totalSaidas", `R$ ${saidas.toFixed(2)}`);
 }
 
 function showAddMovimentacaoModal() {
   editingMovimentacaoId = null;
-  document.getElementById("modalTitle").textContent = "Adicionar Movimentação";
-  document.getElementById("movimentacaoForm").reset();
-  const modal = new bootstrap.Modal(
-    document.getElementById("movimentacaoModal")
-  );
+  setTextContentById(MODAL_ID, ADD_MOV_TXT);
+  getElementById(MOV_FOR_ID).reset();
+  const modal = new bootstrap.Modal(getElementById(MOV_MOD_ID));
   modal.show();
 }
 
@@ -128,41 +138,39 @@ function editMovimentacao(id) {
   const mov = movimentacoes.find((m) => m.id === id);
   if (!mov) return;
 
-  editingMovimentacaoId = id;
-  document.getElementById("modalTitle").textContent = "Editar Movimentação";
-  document.getElementById("valor").value = mov.valor;
-  document.getElementById("tipo").value = mov.tipo;
-  document.getElementById("data_movimentacao").value = new Date(
-    mov.data_movimentacao
-  )
+  const formatedDate = new Date(mov.data_movimentacao)
     .toISOString()
     .slice(0, 16);
-  document.getElementById("categoria").value = mov.categoria;
-  document.getElementById("descricao").value = mov.descricao || "";
-  document.getElementById("contraparte").value = mov.contraparte || "";
 
-  const modal = new bootstrap.Modal(
-    document.getElementById("movimentacaoModal")
-  );
+  editingMovimentacaoId = id;
+  setTextContentById(MODAL_ID, UPD_MOV_TXT);
+  setValueById(VALOR_ID, mov.valor);
+  setValueById(TIPO_ID, mov.tipo);
+  setValueById(DATA_MOVIMENTACAO_ID, formatedDate);
+  setValueById(CATEGORIA_ID, mov.categoria);
+  setValueById(DESCRICAO_ID, mov.descricao || "");
+  setValueById(CONTRAPARTE_ID, mov.contraparte || "");
+
+  const modal = new bootstrap.Modal(getElementById(MOV_MOD_ID));
   modal.show();
 }
-
+function formatDateToApi(date) {
+  date.replace("T", " ");
+}
 async function saveMovimentacao() {
-  const form = document.getElementById("movimentacaoForm");
+  const form = getElementById(MOV_FOR_ID);
   if (!form.checkValidity()) {
     form.reportValidity();
     return;
   }
 
   const data = {
-    valor: parseFloat(document.getElementById("valor").value),
-    tipo: document.getElementById("tipo").value,
-    data_movimentacao: document
-      .getElementById("data_movimentacao")
-      .value.replace("T", " "),
-    categoria: document.getElementById("categoria").value,
-    descricao: document.getElementById("descricao").value,
-    contraparte: document.getElementById("contraparte").value,
+    valor: parseFloat(getValueById(VALOR_ID)),
+    tipo: getValueById(TIPO_ID),
+    data_movimentacao: formatDateToApi(getValueById(DATA_MOVIMENTACAO_ID)),
+    categoria: getValueById(CATEGORIA_ID),
+    descricao: getValueById(DESCRICAO_ID),
+    contraparte: getValueById(CONTRAPARTE_ID),
     usuario_id: currentUser.usuario_id,
   };
 
@@ -170,44 +178,36 @@ async function saveMovimentacao() {
 
   try {
     const url = editingMovimentacaoId
-      ? `${API_BASE_URL}/atualizar_movimentacao`
-      : `${API_BASE_URL}/adicionar_movimentacao`;
-    const method = editingMovimentacaoId ? "PUT" : "POST";
+      ? `${API_BASE_URL}${UPDATE_MOV_URL}`
+      : `${API_BASE_URL}${CREATE_MOV_URL}`;
+    const method = editingMovimentacaoId ? PUT : POST;
 
     const response = await fetch(url, {
       method,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: HEADERS,
       body: JSON.stringify(data),
     });
 
     if (response.ok) {
-      bootstrap.Modal.getInstance(
-        document.getElementById("movimentacaoModal")
-      ).hide();
+      bootstrap.Modal.getInstance(getElementById(MOV_MOD_ID)).hide();
       loadMovimentacoes();
     } else {
       const err = await response.json();
-      alert("Erro: " + (err.erro || "Erro desconhecido"));
+      alert(ERRO + (err.erro || ERRO_DESCONHECIDO));
     }
   } catch (e) {
-    alert("Erro de conexão. Tente novamente.");
+    alert(ERRO_CONEXAO);
   }
 }
 
 async function deleteMovimentacao(id) {
-  if (!confirm("Tem certeza que deseja excluir esta movimentação?")) return;
+  if (!confirm(CONF_EXCL_MOV)) return;
   try {
     const response = await fetch(
-      `${API_BASE_URL}/excluir_movimentacao?movimentacao_id=${id}&usuario_id=${currentUser.usuario_id}`,
+      `${API_BASE_URL}${DELETE_MOV_URL}?movimentacao_id=${id}&usuario_id=${currentUser.usuario_id}`,
       {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          movimentacao_id: id,
-          usuario_id: currentUser.usuario_id,
-        }),
+        method: DELETE,
+        headers: HEADERS,
       }
     );
 
@@ -215,12 +215,15 @@ async function deleteMovimentacao(id) {
       loadMovimentacoes();
     } else {
       const err = await response.json();
-      alert("Erro: " + (err.erro || "Erro desconhecido"));
+      alert(ERRO + (err.erro || ERRO_DESCONHECIDO));
     }
   } catch {
-    alert("Erro de conexão. Tente novamente.");
+    alert(ERRO_CONEXAO);
   }
 }
 
 window.editMovimentacao = editMovimentacao;
 window.deleteMovimentacao = deleteMovimentacao;
+window.getValueById = getValueById;
+window.setValueById = setValueById;
+window.setTextContentById = setTextContentById;
