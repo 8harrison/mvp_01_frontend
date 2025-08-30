@@ -2,6 +2,11 @@
 const { querySelectorAll, getElementById, addEventListener } = document;
 
 class App {
+  loginForm = getElementById("loginForm");
+  registerForm = getElementById("registerForm");
+  addMovimentacaoBtn = getElementById("addMovimentacaoBtn");
+  saveMovimentacaoBtn = getElementById("saveMovimentacaoBtn")
+
   static init() {
     // Configurar navegação
     querySelectorAll(".section-link").forEach((link) => {
@@ -13,16 +18,13 @@ class App {
     });
 
     // Configurar formulários
-    getElementById("loginForm")?.addEventListener("submit", Auth.handleLogin);
-    getElementById("registerForm")?.addEventListener(
-      "submit",
-      Auth.handleRegister
-    );
-    getElementById("addMovimentacaoBtn")?.addEventListener(
+    this.loginForm?.addEventListener("submit", Auth.handleLogin);
+    this.registerForm?.addEventListener("submit", Auth.handleRegister);
+    this.addMovimentacaoBtn?.addEventListener(
       "click",
       Movimentacoes.showAddMovimentacaoModal
     );
-    getElementById("saveMovimentacaoBtn")?.addEventListener(
+    this.saveMovimentacaoBtn?.addEventListener(
       "click",
       Movimentacoes.saveMovimentacao
     );
@@ -60,17 +62,11 @@ class App {
 
       // Reconfigurar event listeners para os elementos carregados dinamicamente
       if (sectionId === "login") {
-        getElementById("loginForm").addEventListener(
-          "submit",
-          Auth.handleLogin
-        );
+        this.loginForm.addEventListener("submit", Auth.handleLogin);
       } else if (sectionId === "registro") {
-        getElementById("registerForm").addEventListener(
-          "submit",
-          Auth.handleRegister
-        );
+        this.registerForm.addEventListener("submit", Auth.handleRegister);
       } else if (sectionId === "dashboard") {
-        getElementById("addMovimentacaoBtn").addEventListener(
+        this.addMovimentacaoBtn.addEventListener(
           "click",
           Movimentacoes.showAddMovimentacaoModal
         );
