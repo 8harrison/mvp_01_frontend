@@ -21,30 +21,28 @@ document.addEventListener("DOMContentLoaded", () => {
     loadMovimentacoes();
   }
 
-  document.getElementById("addMovimentacaoBtn").addEventListener(
-    "click",
-    showAddMovimentacaoModal
-  );
-  document.getElementById("saveMovimentacaoBtn")?.addEventListener(
-    "click",
-    saveMovimentacao
-  );
+  document
+    .getElementById("addMovimentacaoBtn")
+    .addEventListener("click", showAddMovimentacaoModal);
+  document
+    .getElementById("saveMovimentacaoBtn")
+    ?.addEventListener("click", saveMovimentacao);
 
   document.querySelectorAll(".filter-buttons button").forEach((button) => {
     button.addEventListener("click", function () {
       const filter = this.getAttribute("data-filter");
       filterMovimentacoes(filter);
 
-      document.querySelectorAll(".filter-buttons button").forEach((btn) =>
-        btn.classList.remove("active")
-      );
+      document
+        .querySelectorAll(".filter-buttons button")
+        .forEach((btn) => btn.classList.remove("active"));
       this.classList.add("active");
     });
   });
 });
 
 async function getMovimentacoes(userId) {
-  return await fetch(`${API_BASE_URL}${GET_MOV_URL}?usuario_id=${userId}`);
+  return await fetch(`${GET_MOV_URL}?usuario_id=${userId}`);
 }
 
 async function loadMovimentacoes() {
@@ -175,8 +173,8 @@ async function saveMovimentacao() {
 
   try {
     const url = editingMovimentacaoId
-      ? `${API_BASE_URL}${UPDATE_MOV_URL}`
-      : `${API_BASE_URL}${CREATE_MOV_URL}`;
+      ? `${UPDATE_MOV_URL}`
+      : `${CREATE_MOV_URL}`;
     const method = editingMovimentacaoId ? PUT : POST;
 
     const response = await fetch(url, {
@@ -201,7 +199,7 @@ async function deleteMovimentacao(id) {
   if (!confirm(CONF_EXCL_MOV)) return;
   try {
     const response = await fetch(
-      `${API_BASE_URL}${DELETE_MOV_URL}?movimentacao_id=${id}&usuario_id=${currentUser.usuario_id}`,
+      `${DELETE_MOV_URL}?movimentacao_id=${id}&usuario_id=${currentUser.usuario_id}`,
       {
         method: DELETE,
         headers: HEADERS,
