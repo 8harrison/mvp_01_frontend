@@ -2,20 +2,16 @@ let currentUser = null;
 let movimentacoes = [];
 let editingMovimentacaoId = null;
 
-function getElementById(elementId) {
-  return document.getElementById(elementId);
-}
-
 function getValueById(elementId) {
-  return getElementById(elementId).value;
+  return document.getElementById(elementId).value;
 }
 
 function setValueById(elementId, value) {
-  getElementById(elementId).value = value;
+  document.getElementById(elementId).value = value;
 }
 
 function setTextContentById(elementId, text) {
-  getElementById(elementId).textContent = text;
+  document.getElementById(elementId).textContent = text;
 }
 
 // Carregar usuário logado
@@ -25,11 +21,11 @@ document.addEventListener("DOMContentLoaded", () => {
     loadMovimentacoes();
   }
 
-  getElementById("addMovimentacaoBtn").addEventListener(
+  document.getElementById("addMovimentacaoBtn").addEventListener(
     "click",
     showAddMovimentacaoModal
   );
-  getElementById("saveMovimentacaoBtn")?.addEventListener(
+  document.getElementById("saveMovimentacaoBtn")?.addEventListener(
     "click",
     saveMovimentacao
   );
@@ -38,9 +34,10 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", function () {
       const filter = this.getAttribute("data-filter");
       filterMovimentacoes(filter);
-      document
-        .querySelectorAll(".filter-buttons button")
-        .forEach((btn) => btn.classList.remove("active"));
+
+      document.querySelectorAll(".filter-buttons button").forEach((btn) =>
+        btn.classList.remove("active")
+      );
       this.classList.add("active");
     });
   });
@@ -71,10 +68,10 @@ async function loadMovimentacoes() {
 }
 
 function renderMovimentacoes() {
-  const list = getElementById("movimentacoesList");
+  const list = document.getElementById("movimentacoesList");
   list.innerHTML = "";
 
-  if (movimentacoes.length === 0) {
+  if (movimentacoes.length === 0 || !movimentacoes) {
     list.innerHTML = `
       <div class="col-12 text-center py-5">
         <i class="fas fa-receipt fa-3x mb-3 text-muted"></i>
@@ -129,8 +126,8 @@ function updateDashboardStats() {
 function showAddMovimentacaoModal() {
   editingMovimentacaoId = null;
   setTextContentById(MODAL_ID, ADD_MOV_TXT);
-  getElementById(MOV_FOR_ID).reset();
-  const modal = new bootstrap.Modal(getElementById(MOV_MOD_ID));
+  document.getElementById(MOV_FOR_ID).reset();
+  const modal = new bootstrap.Modal(document.getElementById(MOV_MOD_ID));
   modal.show();
 }
 
@@ -151,14 +148,14 @@ function editMovimentacao(id) {
   setValueById(DESCRICAO_ID, mov.descricao || "");
   setValueById(CONTRAPARTE_ID, mov.contraparte || "");
 
-  const modal = new bootstrap.Modal(getElementById(MOV_MOD_ID));
+  const modal = new bootstrap.Modal(document.getElementById(MOV_MOD_ID));
   modal.show();
 }
 function formatDateToApi(date) {
   date.replace("T", " ");
 }
 async function saveMovimentacao() {
-  const form = getElementById(MOV_FOR_ID);
+  const form = document.getElementById(MOV_FOR_ID);
   if (!form.checkValidity()) {
     form.reportValidity();
     return;
@@ -189,7 +186,7 @@ async function saveMovimentacao() {
     });
 
     if (response.ok) {
-      bootstrap.Modal.getInstance(getElementById(MOV_MOD_ID)).hide();
+      bootstrap.Modal.getInstance(document.getElementById(MOV_MOD_ID)).hide();
       loadMovimentacoes();
     } else {
       const err = await response.json();
