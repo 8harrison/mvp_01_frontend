@@ -17,7 +17,7 @@ async function handleLogin(e) {
       body: JSON.stringify({ username, senha: password })
     });
 
-    const data = await response.json();
+    const {data} = await response.json();
 
     if (response.ok) {
       localStorage.setItem("authToken", data.token);

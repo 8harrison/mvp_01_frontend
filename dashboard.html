@@ -1,90 +1,153 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>Dashboard | Finanças</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <!-- Navbar -->
-  <app-navbar></app-navbar>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard | Finanças</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <app-navbar></app-navbar>
 
-  <div class="container mt-4">
-    <section id="dashboard">
-      <div class="dashboard-header">
-        <h2>Dashboard</h2>
-        <button class="btn btn-primary" id="addMovimentacaoBtn">
-          <i class="fas fa-plus me-2"></i>Nova Movimentação
-        </button>
-      </div>
-
-      <div class="row mb-4">
-        <div class="col-md-4"><div class="card stats-card"><h5>Saldo Atual</h5><div class="stats-number" id="saldoAtual">R$ 0,00</div></div></div>
-        <div class="col-md-4"><div class="card stats-card"><h5>Entradas</h5><div class="stats-number entrada" id="totalEntradas">R$ 0,00</div></div></div>
-        <div class="col-md-4"><div class="card stats-card"><h5>Saídas</h5><div class="stats-number saida" id="totalSaidas">R$ 0,00</div></div></div>
-      </div>
-
-      <div class="filter-buttons">
-        <button class="btn btn-outline-primary active" data-filter="todos">Todos</button>
-        <button class="btn btn-outline-success" data-filter="entrada">Entradas</button>
-        <button class="btn btn-outline-danger" data-filter="saida">Saídas</button>
-      </div>
-
-      <div id="movimentacoesList" class="row"></div>
-    </section>
-  </div>
-
-  <!-- Modal -->
-  <div class="modal fade" id="movimentacaoModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">Adicionar Movimentação</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="container mt-4">
+      <section id="dashboard">
+        <div class="dashboard-header">
+          <h2>Dashboard</h2>
+          <button class="btn btn-primary" id="addMovimentacaoBtn">
+            <i class="fas fa-plus me-2"></i>Nova Movimentação
+          </button>
         </div>
-        <div class="modal-body">
-          <form id="movimentacaoForm">
-            <div class="mb-3">
-              <label for="valor" class="form-label">Valor</label>
-              <input type="number" class="form-control" id="valor" step="0.01" required>
+
+        <div class="row mb-4">
+          <div class="col-md-4">
+            <div class="card stats-card">
+              <h5>Saldo Atual</h5>
+              <div class="stats-number" id="saldoAtual">R$ 0,00</div>
             </div>
-            <div class="mb-3">
-              <label for="tipo" class="form-label">Tipo</label>
-              <select class="form-select" id="tipo" required>
-                <option value="">Selecione...</option>
-                <option value="ENTRADA">Entrada</option>
-                <option value="SAIDA">Saída</option>
-              </select>
+          </div>
+          <div class="col-md-4">
+            <div class="card stats-card">
+              <h5>Entradas</h5>
+              <div class="stats-number entrada" id="totalEntradas">R$ 0,00</div>
             </div>
-            <div class="mb-3">
-              <label for="data_movimentacao" class="form-label">Data</label>
-              <input type="datetime-local" class="form-control" id="data_movimentacao" required>
+          </div>
+          <div class="col-md-4">
+            <div class="card stats-card">
+              <h5>Saídas</h5>
+              <div class="stats-number saida" id="totalSaidas">R$ 0,00</div>
             </div>
-            <div class="mb-3">
-              <label for="categoria" class="form-label">Categoria</label>
-              <input type="text" class="form-control" id="categoria" required>
-            </div>
-            <div class="mb-3">
-              <label for="descricao" class="form-label">Descrição</label>
-              <textarea class="form-control" id="descricao" rows="2"></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="contraparte" class="form-label">Contraparte</label>
-              <input type="text" class="form-control" id="contraparte">
-            </div>
-          </form>
+          </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary" id="saveMovimentacaoBtn">Salvar</button>
+
+        <div class="filter-buttons">
+          <button class="btn btn-outline-primary active" data-filter="todos">
+            Todos
+          </button>
+          <button class="btn btn-outline-success" data-filter="entrada">
+            Entradas
+          </button>
+          <button class="btn btn-outline-danger" data-filter="saida">
+            Saídas
+          </button>
+        </div>
+
+        <div id="movimentacoesList" class="row"></div>
+      </section>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="movimentacaoModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalTitle">Adicionar Movimentação</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="movimentacaoForm">
+              <div class="mb-3">
+                <label for="valor" class="form-label">Valor</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="valor"
+                  step="0.01"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="tipo" class="form-label">Tipo</label>
+                <select class="form-select" id="tipo" required>
+                  <option value="">Selecione...</option>
+                  <option value="ENTRADA">Entrada</option>
+                  <option value="SAIDA">Saída</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="data_movimentacao" class="form-label">Data</label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  id="data_movimentacao"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="categoria" class="form-label">Categoria</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="categoria"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="descricao" class="form-label">Descrição</label>
+                <textarea
+                  class="form-control"
+                  id="descricao"
+                  rows="2"
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="contraparte" class="form-label">Contraparte</label>
+                <input type="text" class="form-control" id="contraparte" />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="saveMovimentacaoBtn"
+            >
+              Salvar
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-  <script src="js/navbar.js"></script>
-  <script src="js/dashboard.js"></script>
-</body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <!-- Bootstrap Bundle JS (com Popper incluído) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
 </html>

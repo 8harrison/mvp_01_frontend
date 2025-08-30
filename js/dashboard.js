@@ -8,7 +8,7 @@ let editingMovimentacaoId = null;
 document.addEventListener("DOMContentLoaded", () => {
   currentUser = JSON.parse(localStorage.getItem("user"));
   if (currentUser) {
-    loadMovimentacoes(currentUser);
+    loadMovimentacoes();
   }
 
   document.getElementById("addMovimentacaoBtn").addEventListener("click", showAddMovimentacaoModal);
@@ -24,15 +24,16 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-async function loadMovimentacoes(currentUser) {
+async function loadMovimentacoes() {
   try {
-    const userId = currentUser.data['usuario_id']
+    const userId = currentUser['usuario_id']
     
     const response = await fetch(`${API_BASE_URL}/listar_movimentacoes?usuario_id=${userId}`);
 
     if (response.ok) {
-      const data = await response.json();
-      movimentacoes = data.data || [];
+      const {data} = await response.json();
+      currentUser.saldo = data.saldo
+      movimentacoes = data.movimentacoes || [];
       renderMovimentacoes();
       updateDashboardStats();
     } else {
@@ -61,7 +62,7 @@ function renderMovimentacoes() {
   movimentacoes.forEach(mov => {
     const cardClass = mov.tipo === "ENTRADA" ? "card-entrada" : "card-saida";
     const valorClass = mov.tipo === "ENTRADA" ? "entrada" : "saida";
-    const icon = mov.tipo === "ENTRADA" ? "fa-arrow-down" : "fa-arrow-up";
+    const icon = mov.tipo === "ENTRADA" ? "fa-arrow-up" : "fa-arrow-down";
 
     const date = new Date(mov.data_movimentacao);
     const formattedDate = date.toLocaleDateString("pt-BR") + " " + date.toLocaleTimeString("pt-BR");
@@ -97,7 +98,7 @@ function filterMovimentacoes(filter) {
 }
 
 function updateDashboardStats() {
-  const saldoAtual = currentUser?.data.saldo || 0;
+  const saldoAtual = currentUser?.saldo || 0;
   const entradas = movimentacoes.filter(m => m.tipo === "ENTRADA").reduce((s, m) => s + m.valor, 0);
   const saidas = movimentacoes.filter(m => m.tipo === "SAIDA").reduce((s, m) => s + m.valor, 0);
 
@@ -141,24 +142,25 @@ async function saveMovimentacao() {
   const data = {
     valor: parseFloat(document.getElementById("valor").value),
     tipo: document.getElementById("tipo").value,
-    data_movimentacao: document.getElementById("data_movimentacao").value,
+    data_movimentacao: document.getElementById("data_movimentacao").value.replace('T', ' '),
     categoria: document.getElementById("categoria").value,
     descricao: document.getElementById("descricao").value,
     contraparte: document.getElementById("contraparte").value,
-    usuario_id: currentUser.usuario_id
+    usuario_id: currentUser.usuario_id,
   };
 
   if (editingMovimentacaoId) data.id = editingMovimentacaoId;
 
   try {
-    const token = localStorage.getItem("authToken");
     const url = editingMovimentacaoId ? `${API_BASE_URL}/atualizar_movimentacao` : `${API_BASE_URL}/adicionar_movimentacao`;
     const method = editingMovimentacaoId ? "PUT" : "POST";
 
     const response = await fetch(url, {
       method,
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(data)
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
     });
 
     if (response.ok) {
@@ -168,7 +170,8 @@ async function saveMovimentacao() {
       const err = await response.json();
       alert("Erro: " + (err.erro || "Erro desconhecido"));
     }
-  } catch {
+  } catch(e) {
+    console.log(e)
     alert("Erro de conexão. Tente novamente.");
   }
 }
