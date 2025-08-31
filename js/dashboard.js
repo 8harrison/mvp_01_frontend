@@ -149,9 +149,11 @@ function editMovimentacao(id) {
   const modal = new bootstrap.Modal(document.getElementById(MOV_MOD_ID));
   modal.show();
 }
+
 function formatDateToApi(date) {
-  date.replace("T", " ");
+  return date.replace("T", " ");
 }
+
 async function saveMovimentacao() {
   const form = document.getElementById(MOV_FOR_ID);
   if (!form.checkValidity()) {
@@ -159,10 +161,12 @@ async function saveMovimentacao() {
     return;
   }
 
+  const date = getValueById(DATA_MOVIMENTACAO_ID);
+
   const data = {
     valor: parseFloat(getValueById(VALOR_ID)),
     tipo: getValueById(TIPO_ID),
-    data_movimentacao: formatDateToApi(getValueById(DATA_MOVIMENTACAO_ID)),
+    data_movimentacao: formatDateToApi(date),
     categoria: getValueById(CATEGORIA_ID),
     descricao: getValueById(DESCRICAO_ID),
     contraparte: getValueById(CONTRAPARTE_ID),
