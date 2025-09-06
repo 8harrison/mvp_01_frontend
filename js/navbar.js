@@ -21,7 +21,8 @@ class AppNavbar extends HTMLElement {
             <ul class="navbar-nav ms-auto" id="nav-links">
               <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
               <li class="nav-item"><a class="nav-link" href="registro.html">Registrar</a></li>
-              <li class="nav-item d-none"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+              <li class="nav-item d-none"><a class="nav-link" href="dashboard.html">Movimentações</a></li>
+              <li class="nav-item d-none"><a class="nav-link" href="resumos.html">Resumos</a></li>
               <li class="nav-item d-none"><a class="nav-link" href="#" id="logoutBtn">Sair</a></li>
             </ul>
           </div>
@@ -38,6 +39,7 @@ class AppNavbar extends HTMLElement {
     const login = navLinks.querySelector('a[href="login.html"]')
     const registro = navLinks.querySelector('a[href="registro.html"]')
     const dashboard = navLinks.querySelector('a[href="dashboard.html"]')
+    const resumos = navLinks.querySelector('a[href="resumos.html"]')
     const logout = navLinks.querySelector("#logoutBtn")
 
     if (user) {
@@ -45,12 +47,13 @@ class AppNavbar extends HTMLElement {
       registro.parentElement.classList.add("d-none");
       dashboard.parentElement.classList.remove("d-none");
       logout.parentElement.classList.remove("d-none");
+      resumos.parentElement.classList.remove("d-none");
     } else {
       login.parentElement.classList.remove("d-none");
       registro.parentElement.classList.remove("d-none");
       dashboard.parentElement.classList.add("d-none");
       logout.parentElement.classList.add("d-none");
-
+      resumos.parentElement.classList.add("d-none");
       if (window.location.pathname.endsWith("dashboard.html")) {
         window.location.href = "login.html";
       }

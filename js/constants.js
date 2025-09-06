@@ -3,7 +3,8 @@ const CREATE_MOV_URL = `${API_BASE_URL}/adicionar_movimentacao`;
 const UPDATE_MOV_URL = `${API_BASE_URL}/atualizar_movimentacao`;
 const GET_MOV_URL = `${API_BASE_URL}/listar_movimentacoes`;
 const DELETE_MOV_URL = `${API_BASE_URL}/excluir_movimentacao`;
-const AUTH_USER_URL = `${API_BASE_URL}/autenticar_usuario`
+const AUTH_USER_URL = `${API_BASE_URL}/autenticar_usuario`;
+const GET_RESUMOS_URL = `${API_BASE_URL}/listar_resumos`
 
 const HEADERS = { "Content-Type": "application/json" };
 
