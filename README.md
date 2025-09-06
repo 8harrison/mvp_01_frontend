@@ -1,8 +1,3 @@
-Boa, Harrison 👊 vou montar um **`README.md`** para o frontend do teu projeto, bem direto e claro, seguindo as boas práticas de documentação.
-
----
-
-````markdown
 # 📊 Sistema de Gestão Financeira – Frontend
 
 Este é o **frontend** do Sistema de Gestão Financeira, desenvolvido em **HTML, CSS e JavaScript puro** com integração a um backend em **Flask**.  
