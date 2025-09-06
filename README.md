@@ -22,7 +22,7 @@ O projeto permite que usuários façam **login, cadastro, gestão de movimentaç
 
 ### 2. Clonar o repositório
 ```bash
-git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/8harrison/mvp_01_frontend)
+git clone https://github.com/8harrison/mvp_01_frontend
 cd seu-repositorio/mvp_01_frontend
 ````
 
